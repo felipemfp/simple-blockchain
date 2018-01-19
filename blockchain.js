@@ -1,5 +1,14 @@
 const sha256 = require('js-sha256').sha256
 
+class Message {
+  constructor(from, to, text) {
+    this.from = from
+    this.to = to
+    this.text = text
+    this.timestamp = new Date()
+  }
+}
+
 class Blockchain {
   constructor() {
     this.blocks = []
@@ -7,37 +16,38 @@ class Blockchain {
   }
 
   createGenesisBlock() {
-    const data = 'Hello World!'
-    const timestamp = new Date()
+    const data = new Message('felipemfp', 'felipemfp', 'Hello, Blockchain!')
     const previousHash = 0
     const index = 0
-    this.hashBlock(data, timestamp, previousHash, index)
+    this.hashBlock(data, previousHash, index)
   }
 
-  hashBlock(data, timestamp, prevHash, index) {
+  hashBlock(data, prevHash, index) {
     let hash = '', nonce = 0
 
     while( !this.isHashValid(hash) ){
-      let input = `${data}${timestamp}${prevHash}${index}${nonce}`
+      let input = `${JSON.stringify(data)}${prevHash}${index}${nonce}`
       hash = sha256(input)
       nonce += 1
     }
     console.log(nonce)
-    this.blocks.push(hash)
+    this.blocks.push({
+      hash, payload: data
+    })
   }
 
   getLastHash(blocks) {
-    return blocks.slice(-1)[0]
+    return blocks.slice(-1)[0].hash
   }
 
   isHashValid(hash) {
     return hash.startsWith('0000') // Difficulty
   }
 
-  addNewBlock(data) {
+  addNewBlock(message) {
     const index = this.blocks.length
     const previousHash = this.getLastHash(this.blocks)
-    this.hashBlock(data, new Date(), previousHash, index)
+    this.hashBlock(message, previousHash, index)
   }
 
   getAllBlocks() {
@@ -45,4 +55,7 @@ class Blockchain {
   }
 }
 
-module.exports = Blockchain
+module.exports = {
+  Blockchain,
+  Message
+}
