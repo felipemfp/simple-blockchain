@@ -41,7 +41,17 @@ class Blockchain {
   }
 
   isHashValid(hash) {
-    return hash.startsWith('0000') // Difficulty
+    if (hash === '') return
+    const table = hash.split('').reduce((prev, curr) => {
+      if (prev[curr]) {
+        prev[curr] += 1
+      } else {
+        prev[curr] = 1
+      }
+      return prev
+    }, {})
+    const values = Object.values(table)
+    return values.every(v => v % 2 === 0) // Difficulty
   }
 
   addNewBlock(message) {
