@@ -1,47 +1,48 @@
 const sha256 = require('js-sha256').sha256
 
-const blockchain = (function() {
-  const blocks = []
+class Blockchain {
+  constructor() {
+    this.blocks = []
+    this.createGenesisBlock()
+  }
 
-  const initBlockchain = () => {
+  createGenesisBlock() {
     const data = 'Hello World!'
     const timestamp = new Date()
     const previousHash = 0
     const index = 0
-    hashBlock(data, timestamp, previousHash, index)
+    this.hashBlock(data, timestamp, previousHash, index)
   }
 
-  const hashBlock = (data, timestamp, prevHash, index) => {
+  hashBlock(data, timestamp, prevHash, index) {
     let hash = '', nonce = 0
 
-    while( !isHashValid(hash) ){
+    while( !this.isHashValid(hash) ){
       let input = `${data}${timestamp}${prevHash}${index}${nonce}`
       hash = sha256(input)
       nonce += 1
     }
     console.log(nonce)
-    blocks.push(hash)
+    this.blocks.push(hash)
   }
 
-  const getLastHash = blocks => blocks.slice(-1)[0]
-
-  const isHashValid = hash => hash.startsWith('0000') // Difficulty
-
-  const addNewBlock = data => {
-    const index = blocks.length
-    const previousHash = getLastHash(blocks)
-    hashBlock(data, new Date(), previousHash, index)
+  getLastHash(blocks) {
+    return blocks.slice(-1)[0]
   }
 
-  const getAllBlocks = () => blocks
-
-  return {
-    initBlockchain,
-    getLastHash,
-    blocks,
-    getAllBlocks,
-    addNewBlock
+  isHashValid(hash) {
+    return hash.startsWith('0000') // Difficulty
   }
-})()
 
-module.exports = blockchain
+  addNewBlock(data) {
+    const index = this.blocks.length
+    const previousHash = this.getLastHash(this.blocks)
+    this.hashBlock(data, new Date(), previousHash, index)
+  }
+
+  getAllBlocks() {
+    return this.blocks
+  }
+}
+
+module.exports = Blockchain

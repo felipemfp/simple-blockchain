@@ -1,6 +1,7 @@
-const blockchain = require('./blockchain')
+const Blockchain = require('./blockchain')
 
-blockchain.initBlockchain()
+const blockchain = new Blockchain()
+
 blockchain.addNewBlock('First new block')
 blockchain.addNewBlock('I love blockchains')
 blockchain.addNewBlock('Make me a new hash!!')
